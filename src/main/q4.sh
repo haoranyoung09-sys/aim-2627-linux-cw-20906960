@@ -1,10 +1,13 @@
 #!/bin/bash
-# Q4：合并日志，按级别提取，保存首尾片段并统计错误行数。
+# Q4：合并与筛选日志，生成 all/errors/attention/recent/first-errors/error-count。
 # 完整接口与验收规格见 Problem.pdf。只修改本文件，不修改测试或工具。
 set -eu
 input=${1:?需要输入目录}
 output=${2:?需要输出目录}
 
-# TODO：删除下方提示和 exit 77，再填写你的命令。
-printf '%s\n' 'Q4 尚未实现' >&2
-exit 77
+cat "$input/boot.log" "$input/run.log" > "$output/all.log"
+grep "^ERROR " "$output/all.log" > "$output/errors.log" || true
+grep -E "^(WARN |ERROR )" "$output/all.log" > "$output/attention.log" || true
+tail -n 5 "$output/all.log" > "$output/recent.log"
+head -n 3 "$output/errors.log" > "$output/first-errors.log"
+grep -c "^ERROR " "$output/all.log" > "$output/error-count.txt" || true
